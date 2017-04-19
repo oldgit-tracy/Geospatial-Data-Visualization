@@ -6,13 +6,16 @@ body {
   font-size: 9pt;
 }
 
-#tooltip {
+#tooltip: hover{
   font-weight: 600;
   text-shadow: 0px 0px 2px white;
-
+  white-space: pre-line;
   fill: black;
   stroke: none;
+
+
 }
+
 
 path.land {
   fill: #dddddd;
@@ -28,7 +31,7 @@ path.neighborhood {
 
 
 .active {
-  stroke: red !important;
+  stroke: black !important;
   stroke-width: 1.5px !important;
 }
 
@@ -38,3 +41,16 @@ circle.symbol {
   stroke: white;
   stroke-width: 1px;
 }
+
+
+/* Legend Font Style */
+body {
+	font: 15px sans-serif;
+}
+/*
+/* Legend Position Style */
+.legend {
+	position: relative;
+	left:800px;
+	top:350px;
+}*/

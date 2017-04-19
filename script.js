@@ -63,38 +63,27 @@ function drawMap(error, basemap) {
       d.properties.outline = this;
     });
 
-    //
-    // function get_centroid(sel){
-    //   var coords = d3.select(sel).attr('d');
-    // //  coords = coords.replace(/ *[LC] */g,'],[').replace(/ *M */g,'[[[').replace(/ *z */g,']]]').replace(/ /g,'],[');
-    //   return d3.geo.path().centroid({
-    //     "type":"Feature",
-    //     "geometry":{"type":"Polygon","coordinates":JSON.parse(coords)}
-    //   });
-    // }
-    //
 
   // setup tooltip (shows neighborhood name)
     var tip = g.tooltip.append("text").attr("id", "tooltip");
     tip.attr("text-anchor", "end");
     tip.attr("dx", -5);
     tip.attr("dy", -5);
-    tip.style("visibility", "hidden");
+    tip.style("visibility", "hidden")
+    tip.append("xhtml:body")
+      .style("text-align", "left")
+      .style("background", "none")
+      .html("<p>N/A</p >");
+
+
 
     // add interactivity
     land.on("mouseover", function(d) {
-        //tip.text(d.properties.supname + " , " +d.properties.supdist );
-        //tip.text(d.properties.supdist) // show properties text
-        tip.text(
-          "supname:" + d.properties.supname + "<\r>"+
-           "Supervisor:" + d.properties.supervisor  + "\n" +
-           "Numbertext:" + d.properties.numbertext + "\n" +
-           "SUPERVISORIAL DISTRICT:" + d.properties.supdist)
-        ;
+        tip.text("Supname: "+d.properties.supname + ", " +"Supdist: "+d.properties.supdist );
 
 
-        tip.style("visibility", "visible")
-        ;
+
+        tip.style("visibility", "visible");
 
         d3.select(d.properties.outline).raise();
         d3.select(d.properties.outline).classed("active", true);
@@ -112,80 +101,8 @@ function drawMap(error, basemap) {
     d3.json(urls.Trees, drawTrees);
   }
 
-  // function drawTrees(error, Trees) {
-  //   if (error) throw error;
-  //   console.log("Trees", Trees);
-  //
-  //   var symbols = g.Trees.selectAll("circle")
-  //     //.data(Trees)
-  //     .enter()
-  //     .append("circle")
-  //     // .attr("cx",40)
-  //     // .attr("cy",40)
-  //     .attr("cx", function(d) { return projection([+d.latitude, +d.longitude])[0]; })
-  //       .attr("cy", function(d) { return projection([+d.latitude, +d.longitude])[1]; })
-  //     //  .attr("cx", function(d) { return projection([+d.x, +d.y])[0]; })
-  //     //    .attr("cy", function(d) { return projection([+d.x, +d.y])[1]; })
-  //
-  //     .attr("r", 5)
-  //     .attr("fill", function(d) {
-  //    if (d[12] == "Closed") {
-  //      return "red";
-  //    } else if (d[12] == "Open") {
-  //      return "green";
-  //    } else {
-  //      return "black";
-  //    }
-  //  })
-  //  .attr("class", "symbol");
-  //
-  //
-  //
-  //     var symbols = g.Trees.selectAll("circle")
-  //         .data(Trees.data)
-  //         .enter()
-  //         .append("circle")
-  //         .attr("cx", function(d) { return projection([+d[21][2], +d[21][1]])[0]; })
-  //         .attr("cy", function(d) { return projection([+d[21][2], +d[21][1]])[1]; })
-  //         .attr("r", 5)
-  //         .attr("class", "symbol");
-  //
-  //
-  //   // add details widget
-  //   // https://bl.ocks.org/mbostock/1424037
-  //   var details = g.details.append("foreignObject")
-  //     .attr("id", "details")
-  //     .attr("width", 960)
-  //     .attr("height", 600)
-  //     .attr("Point",0)
-  //     // .attr("x", 0)
-  //     // .attr("y", 0);
-  //
-  //   var body = details.append("xhtml:body")
-  //     .style("text-align", "left")
-  //     .style("background", "none")
-  //     .html("<p>N/A</p>");
-  //
-  //   details.style("visibility", "hidden");
-  //
-  //   symbols.on("mouseover", function(d) {
-  //     d3.select(this).raise();
-  //     d3.select(this).classed("active", true);
-  //
-  //
-  //     body.html("<table border=0 cellspacing=0 cellpadding=2>" + "\n" +
-  //       "<tr><th>Supervisor District:</th><td>" + d.SupervisorDistricts + "</td></tr>" + "\n" +
-  //       "<tr><th>Category:</th><td>" + d.category + "</td></tr>" + "\n" +
-  //       "<tr><th>Neighborhood:</th><td>" + d.Neighborhood + "</td></tr>" + "\n" +
-  //       "</table>");
-  //
-  //     details.style("visibility", "visible");
-  //   });
-  //
-  //   symbols.on("mouseout", function(d) {
-  //     d3.select(this).classed("active", false);
-  //     details.style("visibility", "hidden");
-  //   });
+
+
   function drawTrees(error, Trees) {
   if (error) throw error;
   console.log("Trees", Trees);
@@ -199,11 +116,11 @@ function drawMap(error, basemap) {
     .attr("r", 5)
     .attr("fill", function(d) {
       if (d[12] == "Closed") {
-        return "red";
+        return "lightblue";
       } else if (d[12] == "Open") {
-        return "green";
+        return "pink";
       } else {
-        return "black";
+        return "red";
       }
     })
     .attr("class", "symbol");
@@ -215,8 +132,8 @@ function drawMap(error, basemap) {
     .attr("width", 960)
     .attr("height", 600)
     .attr("Point",0)
-    // .attr("x", 0)
-    // .attr("y", 0);
+    .attr("x", 0)
+    .attr("y", 0);
 
   var body = details.append("xhtml:body")
     .style("text-align", "left")
@@ -253,5 +170,4 @@ function drawMap(error, basemap) {
     return "translate(" + String(x) + "," + String(y) + ")";
   }
 
-
-// }
+var legendText = ["Closed", "Opened"];

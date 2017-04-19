@@ -1,13 +1,147 @@
 <!DOCTYPE html>
 <head>
 <meta charset="utf-8">
+<style>
+body{
+    width:1060px;
+    margin:10px auto;
+}
+
+.legend td{
+    padding:10px 10px;
+    vertical-align:bottom;
+}
+</style>
+
 <link href="style.css" rel="stylesheet" type="text/css">
 <title>Supervisor Districts as of April 2012</title>
 </head>
 
 <body>
-<svg width="960" height="600"></svg>
+<h1>HOMEWORK 3 -- Geospatial Data Visualization</h1>
+<h2>Decription</h2>
+<p>The basemap is obtained from <a href=" https://data.sfgov.org/Geographic-Locations-and-Boundaries/Supervisor-Districts-as-of-April-2012/xz9b-wyfc">Supervisor District boundaries.</a>
+Each district in the base map has its supdist and neighbouWe use a geospatial data visualization technique to visualize data from the
+ <a href="https://data.sfgov.org/City-Infrastructure/Tree-Maintenance-2016/d9d2-cuwu">"311 Tree Maintenance Requests"</a>
+ dataset. To be more specific, This is a non-proportional symbol map that colored by column "Status", which has pink represents open status and lightblue shows closed status.
+ Each district in the base map shows its supdist and supname, while each point represents a tree maintenance record and shows additional information such as neighbourhood, request details and supervisor district.
+ It is obeserved to conclude that (blue)closed case is the majority, and it also shows where the most trees are planted. This data visualization can provide useful infomation to goverment authority about making decision in tree maintenance. </p>
+<h2>About Author</h2>
+<p>I am Yuanyuan Ruan. I call myself a dream chaser, who love making plans and working hard to achieve my goals. Data is everywhere in our life, and it is fun to observed the data and analyse them based on the skills I learn. It gives me motivation to learn more about technical skills and other useful info.</p>
+ <div id='dashboard'>
+ </div>
+
+<svg width="960" height="960"></svg>
 <script src="https://d3js.org/d3.v4.min.js"></script>
 <script src="script.js"></script>
+<script>
+function dashboard(id, fData){
+    var barColor = 'steelblue';
+    function segColor(c){ return {open:"pink", closed:"lightblue"}[c]; }
 
+    // compute total for each state.
+    fData.forEach(function(d){d.total=d.freq.open+d.freq.closed+d.freq.high;});
+
+    // function to handle histogram.
+    function histoGram(fD){
+        var hG={},    hGDim = {t: 60, r: 0, b: 30, l: 0};
+        hGDim.w = 500 - hGDim.l - hGDim.r,
+        hGDim.h = 300 - hGDim.t - hGDim.b;
+
+        hG.update = function(nD, color){
+            // update the domain of the y-axis map to reflect change in frequencies.
+            y.domain([0, d3.max(nD, function(d) { return d[1]; })]);
+
+            // Attach the new data to the bars.
+            var bars = hGsvg.selectAll(".bar").data(nD);
+
+            // transition the height and color of rectangles.
+            bars.select("rect").transition().duration(500)
+                .attr("y", function(d) {return y(d[1]); })
+                .attr("height", function(d) { return hGDim.h - y(d[1]); })
+                .attr("fill", color);
+
+            // transition the frequency labels location and change value.
+            bars.select("text").transition().duration(500)
+                .text(function(d){ return d3.format(",")(d[1])})
+                .attr("y", function(d) {return y(d[1])-5; });
+        }
+        return hG;
+    }
+
+    // function to handle pieChart.
+    function pieChart(pD){
+        var pC ={},    pieDim ={w:250, h: 250};
+        pieDim.r = Math.min(pieDim.w, pieDim.h) / 2;
+
+
+        pC.update = function(nD){
+            piesvg.selectAll("path").data(pie(nD)).transition().duration(500)
+                .attrTween("d", arcTween);
+        }
+        // Utility function to be called on mouseover a pie slice.
+        function mouseover(d){
+            // call the update function of histogram with new data.
+            hG.update(fData.map(function(v){
+                return [v.State,v.freq[d.data.type]];}),segColor(d.data.type));
+        }
+        //Utility function to be called on mouseout a pie slice.
+        function mouseout(d){
+            // call the update function of histogram with all data.
+            hG.update(fData.map(function(v){
+                return [v.State,v.total];}), barColor);
+        }
+
+        return pC;
+    }
+
+    // function to handle legend.
+    function legend(lD){
+        var leg = {};
+
+        // create table for legend.
+        var legend = d3.select(id).append("table").attr('class','legend');
+
+        // create one row per segment.
+        var tr = legend.append("tbody").selectAll("tr").data(lD).enter().append("tr");
+
+        // create the first column for each segment.
+        tr.append("td").append("svg").attr("width", '16').attr("height", '16').append("rect")
+            .attr("width", '16').attr("height", '16')
+   .attr("fill",function(d){ return segColor(d.type); });
+
+        // create the second column for each segment.
+        tr.append("td").text(function(d){ return d.type;});
+
+        leg.update = function(nD){
+
+        }
+
+
+
+        return leg;
+    }
+
+    // calculate total frequency by segment for all state.
+    var tF = ['open','closed'].map(function(d){
+        return {type:d, freq: d3.sum(fData.map(function(t){ return t.freq[d];}))};
+    });
+
+    // calculate total frequency by state for all segment.
+    var sF = fData.map(function(d){return [d.State,d.total];});
+
+    var hG = histoGram(sF), // create the histogram.
+        pC = pieChart(tF), // create the pie-chart.
+        leg= legend(tF);  // create the legend.
+}
+</script>
 </body>
+
+<script>
+var freqData=[
+{State:'AL',freq:{open:4786, closed:1319}}
+
+];
+
+dashboard('#dashboard',freqData);
+</script>
